@@ -50,7 +50,7 @@ do
     for s in $(seq -f "0%g" 0 ${SHARD})
     do
         # wget ${PRESIGNED_URL/'*'/"${MODEL_PATH}/consolidated.${s}.pth"} -O ${TARGET_FOLDER}"/${MODEL_PATH}/consolidated.${s}.pth"
-        aria2c --console-log-level=error -c -x 16 -s 16 -k 1M --max-tries=1000 --user-agent="Wget/1.21.4" --check-certificate=false ${PRESIGNED_URL/'*'/"${MODEL_PATH}/consolidated.${s}.pth"} -d ${TARGET_FOLDER}"/${MODEL_PATH}" -o "consolidated.${s}.pth"
+        aria2c -c -x 16 -s 16 -k 1M --max-tries=1000 --user-agent="Wget/1.21.4" --check-certificate=false ${PRESIGNED_URL/'*'/"${MODEL_PATH}/consolidated.${s}.pth"} -d ${TARGET_FOLDER}"/${MODEL_PATH}" -o "consolidated.${s}.pth"
     done
 
     wget ${PRESIGNED_URL/'*'/"${MODEL_PATH}/params.json"} -O ${TARGET_FOLDER}"/${MODEL_PATH}/params.json"

@@ -14,12 +14,12 @@ if [[ $MODEL_SIZE == "" ]]; then
 fi
 
 echo "Downloading LICENSE and Acceptable Usage Policy"
-aria2c --console-log-level=error -c -x 16 -s 16 -k 1M "${PRESIGNED_URL/'*'/'LICENSE'}" -d "${TARGET_FOLDER}"
-aria2c --console-log-level=error -c -x 16 -s 16 -k 1M "${PRESIGNED_URL/'*'/'USE_POLICY.md'}" -d "${TARGET_FOLDER}"
+wget ${PRESIGNED_URL/'*'/"LICENSE"} -O ${TARGET_FOLDER}"/LICENSE"
+wget ${PRESIGNED_URL/'*'/"USE_POLICY.md"} -O ${TARGET_FOLDER}"/USE_POLICY.md"
 
 echo "Downloading tokenizer"
-aria2c --console-log-level=error -c -x 16 -s 16 -k 1M "${PRESIGNED_URL/'*'/'tokenizer.model'}" -d "${TARGET_FOLDER}"
-aria2c --console-log-level=error -c -x 16 -s 16 -k 1M "${PRESIGNED_URL/'*'/'tokenizer_checklist.chk'}" -d "${TARGET_FOLDER}"
+wget ${PRESIGNED_URL/'*'/"tokenizer.model"} -O ${TARGET_FOLDER}"/tokenizer.model"
+wget ${PRESIGNED_URL/'*'/"tokenizer_checklist.chk"} -O ${TARGET_FOLDER}"/tokenizer_checklist.chk"
 (cd ${TARGET_FOLDER} && md5sum -c tokenizer_checklist.chk)
 
 for m in ${MODEL_SIZE//,/ }
@@ -45,15 +45,17 @@ do
     fi
 
     echo "Downloading ${MODEL_PATH}"
-    mkdir -p "${TARGET_FOLDER}/${MODEL_PATH}"
+    mkdir -p ${TARGET_FOLDER}"/${MODEL_PATH}"
 
     for s in $(seq -f "0%g" 0 ${SHARD})
     do
-        aria2c --console-log-level=error -c -x 16 -s 16 -k 1M "${PRESIGNED_URL/'*'/${MODEL_PATH}/consolidated.${s}.pth'}" -d "${TARGET_FOLDER}/${MODEL_PATH}"
+        # wget ${PRESIGNED_URL/'*'/"${MODEL_PATH}/consolidated.${s}.pth"} -O ${TARGET_FOLDER}"/${MODEL_PATH}/consolidated.${s}.pth"
+        aria2c --console-log-level=error -c -x 16 -s 16 -k 1M --max-tries=1000 --user-agent="Wget/1.21.4" --check-certificate=false ${PRESIGNED_URL/'*'/"${MODEL_PATH}/consolidated.${s}.pth"} -d ${TARGET_FOLDER}"/${MODEL_PATH}" -o "consolidated.${s}.pth"
     done
 
-    aria2c --console-log-level=error -c -x 16 -s 16 -k 1M "${PRESIGNED_URL/'*'/${MODEL_PATH}/params.json'}" -d "${TARGET_FOLDER}/${MODEL_PATH}"
-    aria2c --console-log-level=error -c -x 16 -s 16 -k 1M "${PRESIGNED_URL/'*'/${MODEL_PATH}/checklist.chk'}" -d "${TARGET_FOLDER}/${MODEL_PATH}"
+    wget ${PRESIGNED_URL/'*'/"${MODEL_PATH}/params.json"} -O ${TARGET_FOLDER}"/${MODEL_PATH}/params.json"
+    wget ${PRESIGNED_URL/'*'/"${MODEL_PATH}/checklist.chk"} -O ${TARGET_FOLDER}"/${MODEL_PATH}/checklist.chk"
     echo "Checking checksums"
-    (cd "${TARGET_FOLDER}/${MODEL_PATH}" && md5sum -c checklist.chk)
+    (cd ${TARGET_FOLDER}"/${MODEL_PATH}" && md5sum -c checklist.chk)
 done
+
